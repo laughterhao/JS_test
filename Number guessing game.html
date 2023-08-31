@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <!DOCTYPE html>
+    <html lang="en-us">
+      <head>
+        <meta charset="utf-8" />
+        <title>Number guessing game</title>
+        <style>
+          html {
+            font-family: sans-serif;
+          }
+
+          body {
+            width: 50%;
+            max-width: 800px;
+            min-width: 480px;
+            margin: 0 auto;
+          }
+
+          .form input[type="number"] {
+            width: 200px;
+          }
+
+          .lastResult {
+            color: white;
+            padding: 3px;
+          }
+        </style>
+      </head>
+
+      <body>
+        <h1>Number guessing game</h1>
+
+        <p>
+          We have selected a random number between 1 and 100. See if you can
+          guess it in 10 turns or fewer. We'll tell you if your guess was too
+          high or too low.
+        </p>
+
+        <div class="form">
+          <label for="guessField">Enter a guess: </label>
+          <input
+            type="number"
+            min="1"
+            max="100"
+            required
+            id="guessField"
+            class="guessField"
+          />
+          <input type="submit" value="Submit guess" class="guessSubmit" />
+        </div>
+
+        <div class="resultParas">
+          <p class="guesses"></p>
+          <p class="lastResult"></p>
+          <p class="lowOrHi"></p>
+        </div>
+
+        <script>
+          let randomNumber = Math.floor(Math.random() * 100) + 1;
+          // 先建立一個隨機變數 值為1~100之間
+          const guesses = document.querySelector(".guesses");
+          //存放猜測的數 常數
+          const lastResult = document.querySelector(".lastResult");
+          //存放上一個猜的數值 常數
+          const lowORHi = document.querySelector(".lowOrHi");
+          console.log(lowORHi);
+          //判斷猜的結果是高還是低
+
+          const guessSubmit = document.querySelector(".guessSubmit");
+          // 送出玩家所輸入的值
+          const guessField = document.querySelector(".guessField");
+          // 計算所猜的次數
+
+          let guessCount = 1;
+          // 執行的次數由1開始計算
+          let resetButton;
+          // 重置按鈕
+
+          function checkGuess() {
+            //把值設定為表單中的值,使用Number()讓值絕對為數字
+            var userGuess = Number(guessField.value);
+            //判斷玩家是否為第一次執行,is true 會顯示Previous guesses的字串在P標籤上,如過不是程式碼會往下走
+            if (guessCount === 1) {
+              guesses.textContent = " Previous guesses ";
+            }
+            // guesses.textContent = guesses.textContent + userGuess + ''
+            // '' 的用意是為了上一筆數字和下一筆數字之間有空格
+            guesses.textContent += userGuess + " ";
+            //判斷玩家猜測的數值和randomNumber值是否一樣,如果一樣會顯示出綠色的訊息然後清除lowOrHigh的內容,並執行GameOver()這函式 ps.userGuess === reandomNumber 不能只用 = 因為 = 是代表賦予值,而不是做布琳的判斷
+            if (userGuess === randomNumber) {
+              lastResult.textContent = " Congretulation! You got it right! ";
+              lastResult.style.backgroundColor = " green ";
+              lowORHi.textcontent = "";
+              setGameOver();
+            //當玩家猜測數字 = 10 次時, 會顯示Game Over的文字,並執行setGameOver()這函式
+            } else if (guessCount === 10) {
+              lastResult.textContent = "!!!Game Over!!!";
+              setGameOver();
+            //當玩家猜的數字不等於randomNumber時,會出現紅色的背景顏色,並透過if{} else if{}做判斷玩家猜的數字有沒有大於randomNumber的數值
+            } else {
+              lastResult.textContent = "Wrong!";
+              lastResult.style.backgroundColor = "red";
+              if (userGuess < randomNumber) {
+                lowORHi.textContent = "Last guess was too low!";
+              } else if (userGuess > randomNumber) {
+                lowORHi.textContent = "Last guess was too high!";
+              }
+            }
+            //guessCount++ 玩家每猜一次,而增加一次
+            guessCount++;
+            //清空guessField 的值
+            guessField.value = "";
+            //使用focus()讓玩家不用點值表單就可以直接輸入數字
+            guessField.focus();
+          }
+          function setGameOver() {
+            //把表單的輸入框與按鈕的disabled屬性設為true 用意是會得當遊戲結束了,要玩家不能使用,以免出錯
+            guessField.disabled = true;
+            guessSubmit.disabled = true;
+            //新增一個按鈕
+            resetButton = document.createElement("button");
+            //名稱為Start new game
+            resetButton.textContent = "Start new game";
+            //讓他生成的位置在Html的尾端
+            document.body.appendChild(resetButton);
+            //然後幫按鈕監聽,當按下按鈕時,會執行resetGame這個函式
+            resetButton.addEventListener("click", resetGame);
+          }
+          //將所有程式碼重置,讓玩家可以重新遊玩
+          function resetGame(){
+            //將guessCount設回1
+            guessCount = 1;
+            //清除所有訊息段落
+            var resetParas = document.querySelectorAll(".resultParas p");
+            for (var i = 0 ; i< resetParas.length; i++){
+              resetParas[i].textContent = '';
+            }
+            //將重置按鈕移除
+            resetButton.parentNode.removeChild(resetButton);
+            //讓表單元素有效化
+            guessField.disabled = false;
+            guessSubmit.disabled = false;
+            guessField.value = '';
+            guessField.focus();
+            //讓lastResult 段落背景為白色
+            lastResult.style.backgroundColor = 'white';
+            //必須要重新定義,亂數才會重新產生
+            randomNumber = Math.floor(Math.random() * 100) + 1;
+
+          }
+          guessSubmit.addEventListener("click", checkGuess);
+        </script>
+      </body>
+    </html>
+  </body>
+</html>
